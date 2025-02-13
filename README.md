@@ -7,6 +7,9 @@ A fun and quirky app to shoot your shot… but with a twist—make it a quiz! Th
 - **Play a Demo**: Try out a demo version to get a feel for how it works.  
 - **Funny and Irresistible Experience**: The quiz won’t take "No" for an answer—just like you shouldn’t! 💪  
 
+## Test
+- [askmeeout.netlify.app](https://askmeeout.netlify.app/)
+
 ## 👀 Preview  
 ![App Preview](./public/landingPage.png)  
 

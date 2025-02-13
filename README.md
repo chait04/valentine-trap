@@ -8,7 +8,7 @@ A fun and quirky app to shoot your shot… but with a twist—make it a quiz! Th
 - **Funny and Irresistible Experience**: The quiz won’t take "No" for an answer—just like you shouldn’t! 💪  
 
 ## 👀 Preview  
-![App Preview](./landingPage.png)  
+![App Preview](./public/landingPage.png)  
 
 ## 🔮 Future Features  
 - **Track Submissions**: Know how many people have taken your quiz.  

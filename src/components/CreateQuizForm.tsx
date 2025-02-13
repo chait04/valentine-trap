@@ -1,31 +1,59 @@
 import React, { useState } from 'react';
 import { Heart, ArrowLeft, Send, Copy, CheckCircle2 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
+import { databases, DB_ID, QUIZZES_COLLECTION_ID } from '../lib/appwrite';
 
 interface FormData {
   senderName: string;
   crushName: string;
   seriousnessLevel: number;
+  creatorEmail: string;
+  quizId?: string;
 }
 
 const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
   const [formData, setFormData] = useState<FormData>({
     senderName: '',
     crushName: '',
-    seriousnessLevel: 5
+    seriousnessLevel: 5,
+    creatorEmail: ''
   });
   const [linkGenerated, setLinkGenerated] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLinkGenerated(true);
+    setError('');
+    
+    try {
+      const quizId = uuidv4();
+      // Adjust to match the schema for quizzes
+      await databases.createDocument(DB_ID, QUIZZES_COLLECTION_ID, quizId, {
+        quizId,
+        creatorEmail: formData.creatorEmail,
+        createdAt: new Date().toISOString()
+      });
+      
+      setFormData(prev => ({ ...prev, quizId }));
+      setLinkGenerated(true);
+    } catch (err) {
+      console.error('Failed to create quiz:', err);
+      setError('Failed to create quiz. Please try again.');
+    }
   };
 
   const getShareableLink = () => {
+    if (!formData.quizId) {
+      setError('Quiz ID is missing. Please try creating the quiz again.');
+      return '';
+    }
     const params = new URLSearchParams({
       sender: formData.senderName,
       crush: formData.crushName,
-      level: formData.seriousnessLevel.toString()
+      level: formData.seriousnessLevel.toString(),
+      quizId: formData.quizId,
+      email: formData.creatorEmail
     });
     return `${window.location.origin}/quiz?${params.toString()}`;
   };
@@ -76,6 +104,7 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
 
         <div className="text-center text-rose-600 text-sm">
           <p>Send this link to {formData.crushName} and wait for the magic to happen! ✨</p>
+          <p className="mt-2">We'll notify you at {formData.creatorEmail} when they respond! 📧</p>
         </div>
       </div>
     );
@@ -117,6 +146,20 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
 
         <div>
           <label className="block text-sm font-medium text-rose-700 mb-2">
+            Your Email
+          </label>
+          <input
+            type="email"
+            required
+            value={formData.creatorEmail}
+            onChange={(e) => setFormData(prev => ({ ...prev, creatorEmail: e.target.value }))}
+            className="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent transition bg-white/50 backdrop-blur-sm"
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-rose-700 mb-2">
             Your Crush's Name
           </label>
           <input
@@ -147,6 +190,10 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
           </div>
         </div>
 
+        {error && (
+          <p className="text-red-500 text-sm text-center">{error}</p>
+        )}
+
         <button
           type="submit"
           className="w-full bg-gradient-to-r from-rose-400 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center gap-2"
@@ -159,4 +206,4 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-export default CreateQuizForm
+export default CreateQuizForm;

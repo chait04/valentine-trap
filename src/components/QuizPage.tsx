@@ -4,6 +4,7 @@ import QuizQuestion from './QuizQuestion';
 import QuizCompletion from './QuizCompletion';
 import { ArrowLeft } from 'lucide-react';
 import { quizQuestions } from '../data/quizQuestions';
+import { databases, DB_ID, QUIZZES_COLLECTION_ID, RESPONSES_COLLECTION_ID } from '../lib/appwrite';
 
 const DEMO_DATA = {
   senderName: "Chaitanya",
@@ -14,13 +15,13 @@ const DEMO_DATA = {
 const FUNNY_RESPONSES = {
   yesResponses: [
     "Aww, you said yes! My heart is doing a happy dance! 💃💖",
-    "Yes? OMG, we’re officially the cutest couple! 😍",
+    "Yes? OMG, we're officially the cutest couple! 😍",
     "You just made my day! Prepare for endless love and emojis. 😘💌",
   ],
   noResponses: [
     "No? Hmm... maybe you're just playing hard to get. 😉",
     "Oh no! My heart just broke a little. 💔 Try again?",
-    "Still a no? Alright, I can take the hint... but you’ll regret it! 😏",
+    "Still a no? Alright, I can take the hint... but you'll regret it! 😏",
   ],
 };
 
@@ -49,28 +50,82 @@ const QuizPage: React.FC = () => {
     return Math.min(100, Math.max(70, baseScore + seriousnessAdjustment));
   }, [quizData]);
 
-  const handleAnswer = (answer: boolean) => {
+  useEffect(() => {
+    const loadQuizData = async () => {
+      const quizId = searchParams.get('quizId');
+      const isDemo = searchParams.get('demo') === 'true';
+      const sender = searchParams.get('sender');
+      const crush = searchParams.get('crush');
+      const level = searchParams.get('level');
+
+      if (isDemo) {
+        setQuizData(DEMO_DATA);
+      } else if (quizId && sender && crush && level) {
+        try {
+          // Verify if quiz exists
+          await databases.getDocument(DB_ID, QUIZZES_COLLECTION_ID, quizId);
+          
+          setQuizData({
+            senderName: sender,
+            crushName: crush,
+            seriousnessLevel: parseInt(level, 10),
+          });
+        } catch (error) {
+          console.error('Failed to verify quiz:', error);
+          navigate('/');
+        }
+      } else {
+        navigate('/');
+      }
+    };
+
+    loadQuizData();
+  }, [searchParams, navigate]);
+
+  const handleAnswer = async (answer: boolean) => {
     setLastAnswer(answer);
     setShowResponse(true);
-
-    if (isValentineQuestion) {
-      if (!answer) {
-        setNoResponseIndex((prev) => (prev + 1) % FUNNY_RESPONSES.noResponses.length);
-      } else {
-        setQuizCompleted(true);  // End the quiz if the answer is Yes
+  
+    if (isValentineQuestion && answer) {
+      try {
+        const quizId = searchParams.get('quizId');
+        if (!quizId) return;
+  
+        // Adjust to match the schema for responses
+        await databases.createDocument(DB_ID, RESPONSES_COLLECTION_ID, 'unique()', {
+          quizId,
+          crushName: quizData?.crushName,
+          finalAnswer: 'Yes',
+          answeredAt: new Date().toISOString(),
+        });
+  
+        // Queue the email notification
+        await databases.createDocument(DB_ID, 'email_queue', 'unique()', {
+          to: searchParams.get('email'), // Get email from URL params
+          subject: '💘 Someone Said Yes to Your Valentine Quiz!',
+          content: `Great news! ${quizData?.crushName} has accepted your Valentine's request! Time to celebrate! 🎉`,
+          status: 'pending',
+          createdAt: new Date().toISOString()
+        });
+  
+        setQuizCompleted(true);
+      } catch (error) {
+        console.error('Failed to save response:', error);
+        setQuizCompleted(true); // Complete the quiz despite the error
       }
-    } else {
-      if (answer) {
-        setYesCount((prev) => prev + 1);
-      }
+    } else if (isValentineQuestion) {
+      setNoResponseIndex((prev) => (prev + 1) % FUNNY_RESPONSES.noResponses.length);
+    } else if (answer) {
+      setYesCount((prev) => prev + 1);
     }
   };
+  
 
   const handleNextQuestion = () => {
     setShowResponse(false);
     setLastAnswer(null);
 
-    if (yesCount >= 5 && !isValentineQuestion) {
+    if (yesCount >=3 && !isValentineQuestion) {
       setIsValentineQuestion(true);  // Trigger Valentine question
       return;
     }
@@ -88,25 +143,6 @@ const QuizPage: React.FC = () => {
       setAskedQuestions((prev) => [...prev, availableQuestions[randomIndex]]);
     }
   };
-
-  useEffect(() => {
-    const sender = searchParams.get('sender');
-    const crush = searchParams.get('crush');
-    const level = searchParams.get('level');
-    const isDemo = searchParams.get('demo') === 'true';
-
-    if (isDemo) {
-      setQuizData(DEMO_DATA);
-    } else if (sender && crush && level) {
-      setQuizData({
-        senderName: sender,
-        crushName: crush,
-        seriousnessLevel: parseInt(level, 10),
-      });
-    } else {
-      navigate('/');
-    }
-  }, [searchParams, navigate]);
 
   if (!quizData) return null;
 

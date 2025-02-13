@@ -6,8 +6,8 @@ import { ArrowLeft } from 'lucide-react';
 import { quizQuestions } from '../data/quizQuestions';
 
 const DEMO_DATA = {
-  senderName: "Chris",
-  crushName: "Alex",
+  senderName: "Chaitanya",
+  crushName: "Alexa",
   seriousnessLevel: 7,
 };
 

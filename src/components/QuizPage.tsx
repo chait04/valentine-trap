@@ -125,7 +125,7 @@ const QuizPage: React.FC = () => {
     setShowResponse(false);
     setLastAnswer(null);
 
-    if (yesCount >=3 && !isValentineQuestion) {
+    if (yesCount >=5 && !isValentineQuestion) {
       setIsValentineQuestion(true);  // Trigger Valentine question
       return;
     }

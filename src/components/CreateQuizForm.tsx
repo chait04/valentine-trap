@@ -9,6 +9,7 @@ interface FormData {
   seriousnessLevel: number;
   creatorEmail: string;
   quizId?: string;
+  theme: string;
 }
 
 const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
@@ -16,8 +17,22 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
     senderName: '',
     crushName: '',
     seriousnessLevel: 5,
-    creatorEmail: ''
+    creatorEmail: '',
+    theme: 'movieMania'
   });
+
+  const themes = [
+    { id: 'musicVibes', name: 'Music Vibes' },
+    { id: 'fandomFrenzy', name: 'Fandom Frenzy' },
+    { id: 'retroRomance', name: 'Retro Romance' },
+    { id: 'foodieLove', name: 'Foodie Love' },
+    { id: 'movieMania', name: 'Movie Mania' },
+    { id: 'petLove', name: 'Pet Love' },
+    { id: 'darkHumor', name: 'Dark Indian Humor' },
+    { id: 'travelGoals', name: 'Travel Goals' },
+    { id: 'romanticNights', name: 'Romantic Nights' },
+    { id: 'cheekyQuestions', name: 'Cheeky Couples'}
+  ];
   const [linkGenerated, setLinkGenerated] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
@@ -28,11 +43,15 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
     
     try {
       const quizId = uuidv4();
-      // Adjust to match the schema for quizzes
+      // Store quiz data including crush name in the database
       await databases.createDocument(DB_ID, QUIZZES_COLLECTION_ID, quizId, {
         quizId,
         creatorEmail: formData.creatorEmail,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        theme: formData.theme,
+        senderName: formData.senderName,
+        crushName: formData.crushName,
+        seriousnessLevel: formData.seriousnessLevel
       });
       
       setFormData(prev => ({ ...prev, quizId }));
@@ -49,11 +68,7 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
       return '';
     }
     const params = new URLSearchParams({
-      sender: formData.senderName,
-      crush: formData.crushName,
-      level: formData.seriousnessLevel.toString(),
-      quizId: formData.quizId,
-      email: formData.creatorEmail
+      quizId: formData.quizId
     });
     return `${window.location.origin}/quiz?${params.toString()}`;
   };
@@ -170,6 +185,23 @@ const CreateQuizForm = ({ onBack }: { onBack: () => void }) => {
             className="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent transition bg-white/50 backdrop-blur-sm"
             placeholder="Enter their name"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-rose-700 mb-2">
+            Quiz Theme
+          </label>
+          <select
+            value={formData.theme}
+            onChange={(e) => setFormData(prev => ({ ...prev, theme: e.target.value }))}
+            className="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent transition bg-white/50 backdrop-blur-sm"
+          >
+            {themes.map(theme => (
+              <option key={theme.id} value={theme.id}>
+                {theme.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

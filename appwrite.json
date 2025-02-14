@@ -164,6 +164,38 @@
                     "array": false,
                     "format": "",
                     "default": null
+                },
+                {
+                    "key": "theme",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 20,
+                    "default": null
+                },
+                {
+                    "key": "senderName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "crushName",
+                    "type": "string",
+                    "required": true,
+                    "array": false,
+                    "size": 40,
+                    "default": null
+                },
+                {
+                    "key": "seriousnessLevel",
+                    "type": "integer",
+                    "required": true,
+                    "array": false,
+                    "min": 1,
+                    "max": 10
                 }
             ],
             "indexes": []
@@ -211,6 +243,30 @@
                     "required": true,
                     "array": false,
                     "format": "",
+                    "default": null
+                },
+                {
+                    "key": "answers",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "questions",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255,
+                    "default": null
+                },
+                {
+                    "key": "responses",
+                    "type": "string",
+                    "required": true,
+                    "array": true,
+                    "size": 255,
                     "default": null
                 }
             ],

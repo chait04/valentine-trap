@@ -32,18 +32,29 @@ const QuizCompletion: React.FC<QuizCompletionProps> = ({
 
   if (!accepted) {
     return (
-      <div className="w-full max-w-md mx-auto p-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-pink-100">
-        <div className="text-center space-y-6">
-          <div className="relative">
-            <Heart className="w-16 h-16 text-rose-500 mx-auto animate-pulse" />
-            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-transparent blur-xl rounded-full"></div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="w-full max-w-md mx-auto p-8 bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-pink-100">
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <Heart className="w-16 h-16 text-rose-500/50 mx-auto" />
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 to-transparent blur-xl rounded-full"></div>
+            </div>
+            <h2 className="text-3xl font-bold text-rose-900">
+              Oh no... 💔
+            </h2>
+            <p className="text-xl text-rose-700 mb-4">
+              {crushName} has declined {senderName}'s Valentine request
+            </p>
+            <p className="text-base text-rose-600">
+              Don't worry, there are plenty of fish in the sea! 🌊
+            </p>
+            <button
+              onClick={() => navigate('/')}
+              className="mt-6 bg-rose-600 text-white py-2 px-4 rounded hover:bg-rose-700 transition-colors"
+            >
+              Back to Home
+            </button>
           </div>
-          <h2 className="text-3xl font-bold text-rose-900">
-            Not so fast! 💝
-          </h2>
-          <p className="text-xl text-rose-700">
-            {crushName}, {senderName} really likes you!
-          </p>
         </div>
       </div>
     );

@@ -5,7 +5,8 @@ A fun and quirky app to shoot your shot… but with a twist—make it a quiz! Th
 ## 🛠 Features  
 - **Custom Quiz Creation**: Build a customized Valentine’s Day quiz with unique questions.  
 - **Play a Demo**: Try out a demo version to get a feel for how it works.  
-- **Funny and Irresistible Experience**: The quiz won’t take "No" for an answer—just like you shouldn’t! 💪  
+- **Choose Theme**: Choose from a variety of themes to make your quiz unique.
+- **Get Email**: Get an email with the the quiz answers and crush answer.
 
 ## Test
 - [askmeeout.netlify.app](https://askmeeout.netlify.app/)
